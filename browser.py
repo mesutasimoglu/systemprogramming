@@ -41,6 +41,21 @@ class Browser(QtGui.QMainWindow):
         self.mainLayout.addWidget(self.frame)
         self.setCentralWidget(self.centralwidget)
 
+        self.connect(self.bt_back, QtCore.SIGNAL("clicked()"), self.html.back)
+        self.connect(self.bt_ahead, QtCore.SIGNAL("clicked()"),self.html.forward)
+        self.default_url = "http://google.com"
+        self.tb_url.setText(self.default_url)
+        self.browse()
+
+
+    def browse(self):
+
+
+        url = self.tb_url.text()
+        self.html.load(QtCore.QUrl(url))
+        self.html.show()
+
+
 
 if __name__ == "__main__":
 
