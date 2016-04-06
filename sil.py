@@ -6,6 +6,8 @@ class sil():
         conn=sqlite3.connect("abcd.db")
         c=conn.cursor()
         c.execute("DELETE FROM abcd WHERE ID='%s';" % gelen)
+        print("silindi")
         conn.commit()
+
 
 

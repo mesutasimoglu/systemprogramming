@@ -1,11 +1,7 @@
-
-import sqlite3
 import datetime
-import time
 import sys
 from PyQt4 import QtCore, QtGui, QtWebKit
-import  ekle,getir,sil,kayit
-
+import  ekle,getir,sil
 
 
 try:
@@ -54,12 +50,11 @@ class Browser(QtGui.QMainWindow):
         self.refresh=QtGui.QPushButton(self.frame)
         self.gecmis=QtGui.QPushButton(self.frame)
 
-        self.setObjectName(_fromUtf8("Form"))
-        self.resize(1010, 750)
-        self.listWidget = QtGui.QListWidget(self)
-        self.listWidget.setGeometry(QtCore.QRect(200, 30, 2011, 681))
-        self.listWidget.setObjectName(_fromUtf8("listWidget"))
 
+
+        self.listWidget = QtGui.QListWidget(self)
+        self.listWidget.setGeometry(QtCore.QRect(0, 35, 1365, 800))
+        self.listWidget.setObjectName(_fromUtf8("listWidget"))
         self.listWidget.hide()
 
 
@@ -74,7 +69,6 @@ class Browser(QtGui.QMainWindow):
         self.horizontalLayout.addWidget(self.refresh)
         self.horizontalLayout.addWidget(self.tb_url)
         self.horizontalLayout.addWidget(self.gecmis)
-        self.horizontalLayout.addWidget(self.listWidget)
         self.gridLayout.addLayout(self.horizontalLayout)
 
         self.html = QtWebKit.QWebView()
@@ -82,13 +76,11 @@ class Browser(QtGui.QMainWindow):
         self.mainLayout.addWidget(self.frame)
         self.setCentralWidget(self.centralwidget)
 
-        self.listWidget = QtGui.QListWidget(self)
-        self.listWidget.setGeometry(QtCore.QRect(0, 30, 810, 551))
-        self.listWidget.setObjectName(_fromUtf8("listWidget"))
-        self.listWidget.hide()
 
-
-
+        self.pushButton = QtGui.QPushButton(self.centralwidget)
+        self.pushButton.setGeometry(QtCore.QRect(1360, 32, 31, 26))
+        self.pushButton.setText(_translate("MainWindow", "x", None))
+        self.pushButton.hide()
 
 
 
@@ -96,41 +88,44 @@ class Browser(QtGui.QMainWindow):
         self.connect(self.tb_url, QtCore.SIGNAL("returnPressed()"), self.browse)
         self.connect(self.bt_back, QtCore.SIGNAL("clicked()"), self.html.back)
         self.connect(self.bt_ahead, QtCore.SIGNAL("clicked()"), self.html.forward)
-        self.connect(self.gecmis, QtCore.SIGNAL("clicked()"), self.full)
+        self.connect(self.gecmis, QtCore.SIGNAL("clicked()"), self.ac)
+        self.connect(self.refresh,QtCore.SIGNAL("clicked()"),self.html.reload)
+        self.connect(self.pushButton,QtCore.SIGNAL("clicked()"),self.kapat)
 
 
         an = datetime.datetime.now()
-        tarih = datetime.datetime.strftime(an,'%S')
-
         veriYil = []
         veriYil1 =[]
         gecmisListe = []
         gecmisListe = getir.getir.liste(self)
 
 
+
+
         for v in range(gecmisListe.__len__()):
             veriYil.append(datetime.datetime.strptime(gecmisListe[v][1],"%Y-%m-%d %H:%M:%S.%f"))
-            #print(gecmisListe[v][1])
-            #print(veriYil[v])
+            print(gecmisListe[v][1])
+            print(veriYil[v])
+            print(veriYil)
             for c in range(veriYil.__len__()):
                 if str(datetime.datetime.strftime(veriYil[v],"%d-%B-%Y")) not in str(veriYil1):
                     print("yok")
                     veriYil1.append(datetime.datetime.strftime(veriYil[v],"%d-%B-%Y"))
                     a=str(datetime.datetime.strftime(veriYil[v],"%d-%B-%Y"))
                     b=str(datetime.datetime.strftime(veriYil[v],"%H:%M:%S"))
+
                     self.listWidget.addItem("                                          "+str(a))
                     self.listWidget.addItem(str(b)+"   "+gecmisListe[v][2])
-
-
-
+                    break
 
                 else:
                     print("var")
                     b=str(datetime.datetime.strftime(veriYil[v],"%H:%M:%S"))
                     self.listWidget.addItem(str(b)+"   "+gecmisListe[v][2])
 
-
                     break
+
+
 
 
 
@@ -144,17 +139,17 @@ class Browser(QtGui.QMainWindow):
         self.enter.clicked.connect(self.Enter)
         self.enter.setShortcut("Return")
 
-        #self.listWidget.itemDoubleClicked.connect(self.gecmis_click)
         self.connect(self.listWidget, QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem *)"),self.sil_click)
+
 
 
     def sil_click(self):
 
-
-        print("yapılacak")
-
-        #sil.sil.liste()
-
+        b=self.listWidget.currentItem().text()
+        a=getir.getir.idGetir(b.split()[0])
+        print(a)
+        sil.sil.liste(a[0])
+        self.listWidget.takeItem(self.listWidget.currentRow())
 
 
 
@@ -185,26 +180,28 @@ class Browser(QtGui.QMainWindow):
 
     def browse(self):
 
-        an=time.localtime()
-        url = self.tb_url.text() if self.tb_url.text() else self.default_url
 
+        url = self.tb_url.text() if self.tb_url.text() else self.default_url
         an = datetime.datetime.now()
-        #an=time.localtime()
         params=(an,url)
         ekle.ekle.isles(params)
         self.html.load(QtCore.QUrl(url))
         self.html.show()
 
 
-
-
     def url_changed(self, url):
 
       self.tb_url.setText(url.toString())
+      print("yakında")
 
-    def full(self):
-        #main.showFullScreen()
+
+    def ac(self):
+        self.pushButton.show()
         self.listWidget.show()
+    def kapat(self):
+        self.pushButton.hide()
+        self.listWidget.hide()
+
 
 
 if __name__ == "__main__":
@@ -213,5 +210,6 @@ if __name__ == "__main__":
     main = Browser()
     main.show()
     sys.exit(app.exec_())
+
 
 
